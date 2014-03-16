@@ -1,0 +1,101 @@
+@startuml
+hide <<formulario>> circle
+class index << (P, orchild) php>>{
+script: generar listado
+}
+class estilo << (C, orchild) css>> {
+pendiente de definir
+}
+class funciones_bd << (F, orchild) php>>{
+BD_USUARIO
+BD_PASSWORD
+BD_NOME
+BD_CONEX_PDO
+- conecta_bd()
+}
+class formulario_nuevo_equipo << (P, orchild) php>> {
+Pedir datos para un nuevo equipo
+
+}
+class form_nuevo_equipo <<formulario>> {
+Las variables de sesion si no 
+existen se inicializan
+...
+nombre: text 
+value: $_SESSION[datos][0]
+Si error mostrar MSG_ERR_NOMBRE
+----
+desc: text 
+value: $_SESSION[datos][1]
+Si error mostrar MSG_ERR_DESC
+---
+ip: text 
+value: $_SESSION[datos][2]
+Si error mostrar MSG_ERR_IP
+---
+ram: text 
+value: $_SESSION[datos][3]
+Si error mostrar MSG_ERR_RAM
+}
+
+class SESSION << (S, orchild) _SESSION>> {
+variables de sesion
+---
+-datos: Array con los datos de form
+-errores: Array flags de errores
+-hayErrores: Indica si hay algun error  
+}
+
+class constantes << (F, orchild) php >> {
+Constantes
+---
+- MSG_ERR_NOMBRE
+- MSG_ERR_DESC
+- MSG_ERR_IP
+- MSG_ERR_RAM 
+}
+
+class funciones_validar << (F, orchild) php >> {
+Funciones para validar datos
+...
+- validarNombre(valor): boolean
+- validarDesc(valor) :boolean
+- validarIP(valor) :boolean
+- validarRam(valor) :boolean
+
+}
+class grabar_nuevo_equipo << (P, orchild) php >> {
+Recibe datos del formulario
+...
+}
+
+class grabacion_ok << (P, orchild) php >> {
+Muestra mensaje de grabación correcta
+}
+
+class error << (P, orchild) php >> {
+Muestra mensaje de error
+}
+
+
+index --> formulario_nuevo_equipo: link
+index ..> funciones_bd: include
+index ..> estilo: include
+formulario_nuevo_equipo o-- form_nuevo_equipo
+formulario --> grabar_equipo: submit
+formulario_nuevo_equipo ..> SESSION: usa
+formulario_nuevo_equipo ..> constantes: include
+form_nuevo_equipo --> grabar_nuevo_equipo: submit
+
+grabar_nuevo_equipo ..> funciones_bd: include
+grabar_nuevo_equipo ..> funciones_validar: include
+grabar_nuevo_equipo ..> SESSION: usa
+grabar_nuevo_equipo --> formulario_nuevo_equipo: redirect (error validar)
+grabar_nuevo_equipo --> grabacion_ok: redirect (grabacion correcta)
+grabar_nuevo_equipo --> error: redirect {parameter: msg_error}
+
+grabacion_ok --> index: link
+grabacion_ok --> formulario_nuevo_equipo: link
+
+error --> index: link
+@enduml
